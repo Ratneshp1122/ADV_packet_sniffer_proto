@@ -16,8 +16,7 @@ def send_email_alert(subject, body):
     msg.attach(MIMEText(body, "plain"))
 
     try:
-        # Use the proper SMTP server for your email provider
-        server = smtplib.SMTP("smtp.example.com", 587)  # Replace with actual SMTP server
+        server = smtplib.SMTP("smtp.example.com", 587)  
         server.starttls()
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, msg.as_string())
