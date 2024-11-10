@@ -4,10 +4,10 @@ import requests
 from scapy.all import *
 from logging_config import log_attack, log_anomaly
 from scapy.all import sniff
-from models import *  # Ensure you have a models.py with necessary definitions
+from models import *  
 from alerting import send_email_alert
 from dashboard import start_dashboard
-import logging  # This import ensures logging works correctly
+import logging  
 
 OUTBOUND_CONNECTION_THRESHOLD = 50
 TIME_WINDOW = 60
@@ -60,7 +60,6 @@ def packet_callback(packet):
         alert_message = f"Possible Attack detected from IP {src_ip}"
         send_to_dashboard(alert_message)
 
-        # Ensure detect_* functions return a boolean indicating attack detection
         if detect_botnet(packet) or detect_mitm(packet):
             send_email_alert(f"Attack Alert: {alert_message}")
 
