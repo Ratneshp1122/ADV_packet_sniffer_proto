@@ -4,23 +4,19 @@ import numpy as np
 from scapy.all import *
 from sklearn.ensemble import IsolationForest
 
-# Setup logging configuration
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
-# Constants
 OUTBOUND_CONNECTION_THRESHOLD = 50
 TIME_WINDOW = 60
 arp_table = {}
-known_cnc_ips = {"192.168.100.10", "10.20.30.40"}  # Known botnet IPs
-known_dns_ips = {"example.com": "93.184.216.34"}  # Known DNS mappings
+known_cnc_ips = {"192.168.100.10", "10.20.30.40"} 
+known_dns_ips = {"example.com": "93.184.216.34"}  
 ip_packet_counts = defaultdict(lambda: {'count': 0, 'timestamp': time.time()})
 connection_tracker = defaultdict(list)
 target_ips = ["192.168.100.10", "10.20.30.40"]
 
-# Initialize the Isolation Forest model
 model = IsolationForest()
 
-# Store packet features for anomaly detection
 packet_features = []
 
 
@@ -39,19 +35,17 @@ def detect_anomaly(packet):
     features = np.array([list(extract_features(packet).values())]).reshape(1, -1)
     packet_features.append(features)
 
-    if len(packet_features) > 100:  # Buffer size (100 packets in this case)
+    if len(packet_features) > 100:  
         features_batch = np.vstack(packet_features)
         anomaly_scores = model.fit_predict(features_batch)
-        # Anomaly detection
-        if anomaly_scores[-1] == -1:  # -1 indicates an anomaly
+        if anomaly_scores[-1] == -1: 
             logging.info(f"Anomaly detected from {packet[IP].src}")
-            # Call for further alerting here (e.g., send_email_alert(packet))
 
-        packet_features = []  # Clear the buffer after processing
+        packet_features = [] 
 
 
 def detect_mitm(packet):
-    if ARP in packet and packet[ARP].op == 2:  # ARP reply
+    if ARP in packet and packet[ARP].op == 2:  
         src_ip = packet[ARP].psrc
         src_mac = packet[ARP].hwsrc
         if src_ip in arp_table:
@@ -62,7 +56,7 @@ def detect_mitm(packet):
 
 def detect_ip_spoofing(packet):
     if IP in packet:
-        if packet[IP].ttl < 30:  # Suspicious low TTL value
+        if packet[IP].ttl < 30:  
             logging.info(f"[ALERT] Suspicious IP spoofing detected: {packet[IP].src} with TTL={packet[IP].ttl}")
 
 
